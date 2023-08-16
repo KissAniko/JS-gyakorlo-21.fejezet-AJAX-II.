@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AJAX II.</title>
+</head>
+<body>
+
+    <button id = "login">Bejelentkezés</button>
+
+    <div id = "post-list-container"></div>
+    
+    <script> 
+        
+        // AZ AJAX I. feladatát kiszervezzük egy külön function-be és felparaméterezzük azért, h bárhova tudjunk kéréseket kiküldeni.
+
+
+        document.getElementById("login").onclick =  function(){     
+        //console.log("klikk");  
+
+        var url = 'http://jsonplaceholder.typicode.com/posts';         // A PARAMÉTEREKET A KÖVETKEZŐ SOROKBAN (22-től) ADJUK MEG.
+                                                                       // url = cím, method = GET, body = null (most üres), és 
+        sendRequest(url, 'GET', null, function(posts){                 // .. egy function-t. A továbbiakban ebben találhatom meg a 
+                                                                       // .. posts-t, amit az 53.sorban átalakítottam. 
+
+            var postListHTML = '';  
+           for(var post of posts)  {                                                     
+              postListHTML += '<p>' + post.title + '</p' + '<small>'+ post.body + '</small>'
+                                                               
+           }
+                          
+            document.getElementById("post-list-container").innerHTML = postListHTML;   
+
+    });
+                                                             
+        };
+
+        function sendRequest(url, method, body, callback){                // callback = mit csináljon ha készen van. Típusa: function
+                                                                          // A megadott paramétereket (url, method, body, callback)
+                                                                          // ... bekötjük a megfelelő helyekre
+                           
+
+            var xhr = new XMLHttpRequest;                                               
+                                                                                                                                                           
+            xhr.onreadystatechange  = function(){                                          // Ez az Ún callback function.            
+                                                                                                                                                                                                                                                                                                                                                                         
+            if ((xhr.readyState === 4 && xhr.status === 200)) {                           
+                //  console.log(xhr.responseText);                                            
+                                                                               
+               // console.log(JSON.parse(xhr.responseText));                                    
+               //  var posts = JSON.parse(xhr.responseText); 
+                    callback = JSON.parse(xhr.responseText);               // Ezt a function-t (callback), amit bedobtak kívülről, itt hívjuk meg.
+                                                                           
+
+
+/*  --------------------- EZT A RÉSZT KÍVÜLRŐL KELL MAJD SZOLGÁLTATNI (24-32) ----------------------------------
+
+                var postListHTML = '';  
+
+                for(var post of posts)  {                                                     
+                    postListHTML += '<p>' + post.title + '</p' + '<small>'+ post.body + '</small>'
+                                                                               
+                }
+                //document.getElementById("post-list-container").innerHTML='';                
+                document.getElementById("post-list-container").innerHTML = postListHTML;   
+                
+    ------------------------------------------------------------------------------------------------------*/
+
+            }                                                       
+            };
+
+xhr.sendRequestHeader('content-type', 'application/json' );
+     
+   // xhr.open('GET', 'http://jsonplaceholder.typicode.com/posts' );              
+    xhr.open(method, url);                                                  // A 24. sorban lévő paraméterek egy részét az open-be  kötjük be.
+                                                                                // .. A GET mivel egy methodus, ezért a helyébe method lesz. 
+                                                                                // ..  A http mivel Url, ezért oda kerül az Url     
+    xhr.send('body');                                                           // A send-be kerül a body    
+                                                                                // A callback pedig a  posts helyére  kerül (55). Az 54.sort  kellett átalakítani.      
+  //  xhr.send();                                                               // Mért kell meghívni  a send-et újra?
+
+   }
+        
+    </script>
+    
+  
+</body>
+</html>
+
+
+
+<!--  KLIENS                                                     SERVER
+
+                           POSTS {...}
+               __________________________________>>>>>          
+                                                               
+                                                                / LOGIN
+               
+                          TOKEN {"...."}
+               <<<<<________________________________ 
+
+ 
+
+                       GET {''...: "....."}
+               _________________________________>>>>>
+
+                                                             
+                                                                / USER
+
+                     [....., ......, ......]   
+                      
+                <<<<<______________________________
+                                                               
+            
+            
+            -->
